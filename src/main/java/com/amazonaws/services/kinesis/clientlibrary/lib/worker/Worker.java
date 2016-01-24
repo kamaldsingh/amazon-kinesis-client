@@ -14,6 +14,7 @@
  */
 package com.amazonaws.services.kinesis.clientlibrary.lib.worker;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -78,6 +79,8 @@ public class Worker implements Runnable {
 
     private volatile boolean shutdown;
 
+    private static final HashMap<ShardInfo,ICheckpoint> mapIdtoCheckpoint = new HashMap<ShardInfo,ICheckpoint>();
+    
     // Holds consumers for shards the worker is currently tracking. Key is shard
     // info, value is ShardConsumer.
     private ConcurrentMap<ShardInfo, ShardConsumer> shardInfoShardConsumerMap =
@@ -328,6 +331,8 @@ public class Worker implements Runnable {
                 Set<ShardInfo> assignedShards = new HashSet<ShardInfo>();
                 for (ShardInfo shardInfo : getShardInfoForAssignments()) {
                     ShardConsumer shardConsumer = createOrGetShardConsumer(shardInfo, recordProcessorFactory);
+                    //mapIdtoCheckpoint.put(shardInfo,checkpointTracker);
+                    
                     if (shardConsumer.isShutdown()
                             && shardConsumer.getShutdownReason().equals(ShutdownReason.TERMINATE)) {
                         foundCompletedShard = true;
@@ -465,7 +470,27 @@ public class Worker implements Runnable {
     public void shutdown() {
         this.shutdown = true;
     }
+    
+    /**
+     * Custom flag setting for our KCL 
+     */
+    public void setShutdownFlag(boolean flag) {
+        this.shutdown = flag;
+    }
 
+    public void reStartWorker(){
+    	//recordProcessorFactory.
+    	this.shutdown = true;
+    	try{
+    		Thread.sleep(2000);
+    	}catch (InterruptedException e){
+    		e.printStackTrace();
+    	}
+    	this.shutdown = false;
+    	this.run();
+    }
+    
+   
     /**
      * NOTE: This method is internal/private to the Worker class. It has package
      * access solely for testing.

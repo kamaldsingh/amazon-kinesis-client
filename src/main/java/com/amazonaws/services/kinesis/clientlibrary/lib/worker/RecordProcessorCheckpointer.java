@@ -127,8 +127,10 @@ class RecordProcessorCheckpointer implements IRecordProcessorCheckpointer {
          * If there is a last checkpoint value, we want to check both the lower and upper bound.
          */
         ExtendedSequenceNumber newCheckpoint = new ExtendedSequenceNumber(sequenceNumber, subSequenceNumber);
-        if ((lastCheckpointValue.compareTo(newCheckpoint) <= 0)
-                && newCheckpoint.compareTo(largestPermittedCheckpointValue) <= 0) {
+        //if ((lastCheckpointValue.compareTo(newCheckpoint) <= 0)
+          //      && newCheckpoint.compareTo(largestPermittedCheckpointValue) <= 0) {
+
+        if ( newCheckpoint.compareTo(largestPermittedCheckpointValue) <= 0) {
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Checkpointing " + shardInfo.getShardId() + ", token " + shardInfo.getConcurrencyToken()
